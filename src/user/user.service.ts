@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
+import { EmailConflictException } from './exception/email-conflict-exception';
 import { User } from './user.entity';
 
 @Injectable()
@@ -11,7 +12,11 @@ export class UserService {
   ) {}
 
   async createUser(userDto: CreateUserDto) {
-    const user = new User(userDto.email, userDto.firstName, userDto.lastName);
+    let user = await this.userRepository.findOneBy({ email: userDto.email });
+
+    if (user) throw new EmailConflictException();
+
+    user = new User(userDto.email, userDto.firstName, userDto.lastName);
     await user.setPassword(userDto.password);
     return await this.userRepository.save(user);
   }

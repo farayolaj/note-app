@@ -3,6 +3,7 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { mockReset } from 'jest-mock-extended';
 import { mockRepositoryFactory } from '../common/mocks';
 import { CreateUserDto } from './dto/create-user.dto';
+import { EmailConflictException } from './exception/email-conflict-exception';
 import { User } from './user.entity';
 import { UserService } from './user.service';
 
@@ -36,9 +37,19 @@ describe('UserService', () => {
 
   describe('createUser', () => {
     beforeEach(() => {
+      const map = new Map<string, User>();
       mockRepository.save.mockImplementation(async (entity) => {
-        entity.id = 'uuid';
-        return entity as User;
+        const user = entity as User;
+        user.id = 'uuid';
+        map.set(user.email, user);
+        return user;
+      });
+
+      mockRepository.findOneBy.mockImplementation(async (where) => {
+        if (Array.isArray(where)) where = where[0];
+
+        const user = map.get(where.email as string);
+        return user;
       });
     });
 
@@ -51,6 +62,14 @@ describe('UserService', () => {
       const user = await service.createUser(userDto);
       expect(mockRepository.save).toBeCalledTimes(1);
       expect(user.id).toBe('uuid');
+    });
+
+    it('fails on email conflict', async () => {
+      const userDto = getUserDto();
+      await service.createUser(userDto);
+      expect(service.createUser(userDto)).rejects.toThrow(
+        EmailConflictException,
+      );
     });
 
     it('hashes password', async () => {
