@@ -1,4 +1,5 @@
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import * as bcrypt from 'bcrypt';
 
 @Entity()
 export class User {
@@ -21,5 +22,13 @@ export class User {
     this.email = email;
     this.firstName = firstName;
     this.lastName = lastName;
+  }
+
+  async setPassword(password: string) {
+    this.password = await bcrypt.hash(password, 10);
+  }
+
+  async comparePassword(password: string) {
+    return bcrypt.compare(password, this.password);
   }
 }
