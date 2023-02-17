@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
 import { EmailConflictException } from './exception/email-conflict-exception';
+import { UserNotFoundException } from './exception/user-not-found.exception';
 import { User } from './user.entity';
 
 @Injectable()
@@ -30,6 +31,9 @@ export class UserService {
 
   async getUserById(userId: string) {
     const user = await this.userRepository.findOneBy({ id: userId });
+
+    if (!user) throw new UserNotFoundException();
+
     return user;
   }
 }
