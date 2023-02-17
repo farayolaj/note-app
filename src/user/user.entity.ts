@@ -1,5 +1,6 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import * as bcrypt from 'bcrypt';
+import { Note } from 'src/note/note.entity';
 
 @Entity()
 export class User {
@@ -17,6 +18,10 @@ export class User {
 
   @Column()
   password: string;
+
+  @Column()
+  @OneToMany(() => Note, 'owner')
+  notes: Note[];
 
   constructor(email: string, firstName: string, lastName: string) {
     this.email = email;
