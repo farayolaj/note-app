@@ -1,10 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { PagingOpts } from 'src/common/paging-opts';
 import { UserService } from 'src/user/user.service';
 import { Repository } from 'typeorm';
 import { CreateNoteDto } from './dto/create-note.dto';
 import { UpdateNoteDto } from './dto/update-note.dto';
 import { NoteNotFoundException } from './exception/note-not-found.exception';
+import { NoteList } from './note-list.entity';
 import { Note } from './note.entity';
 
 @Injectable()
@@ -80,13 +82,29 @@ export class NoteService {
   /**
    * Get all notes that belong to a user.
    */
-  async getNotes(userId: string) {
-    const notes = await this.noteRepository.findBy({
-      owner: {
-        id: userId,
+  async getNotes(userId: string, paging?: PagingOpts) {
+    if (!paging) paging = new PagingOpts();
+
+    const notes = await this.noteRepository.find({
+      where: {
+        owner: {
+          id: userId,
+        },
+      },
+      take: paging.pageSize,
+      skip: (paging.page - 1) * paging.pageSize,
+      order: {
+        lastEdited: 'desc',
       },
     });
+    const totalNoteCount = await this.noteRepository.countBy({
+      owner: { id: userId },
+    });
 
-    return notes;
+    return new NoteList(
+      notes,
+      paging.page,
+      Math.max(Math.ceil(totalNoteCount / paging.pageSize), 1),
+    );
   }
 }
