@@ -19,7 +19,6 @@ export class User {
   @Column()
   password: string;
 
-  @Column()
   @OneToMany(() => Note, 'owner')
   notes: Note[];
 

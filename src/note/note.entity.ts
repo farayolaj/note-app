@@ -19,7 +19,6 @@ export class Note {
   @Column({ type: 'text' })
   content: string;
 
-  @Column()
   @ManyToOne(() => User)
   owner: User;
 
