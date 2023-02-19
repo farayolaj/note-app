@@ -21,6 +21,10 @@ async function bootstrap() {
     .setDescription('A simple API service for a note application.')
     .setVersion('0.0.1')
     .addServer(`http://localhost:${port}`, 'Local Server')
+    .addServer(
+      'https://note-app-production.up.railway.app',
+      'Production Server',
+    )
     .addBearerAuth()
     .build();
 
@@ -28,7 +32,7 @@ async function bootstrap() {
   SwaggerModule.setup('openapi-ui', app, document);
 
   const logger = new Logger('NestApplication');
-  await app.listen(3000, () => logger.log(`Listening on port ${port}`));
+  await app.listen(port, () => logger.log(`Listening on port ${port}`));
 }
 
 bootstrap();
