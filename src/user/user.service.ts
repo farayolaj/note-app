@@ -24,11 +24,17 @@ export class UserService {
     return await this.userRepository.save(user);
   }
 
+  /**
+   * Returns user information if the email and password are correct, else it throws an UnauthorizedException
+   */
   async verifyUser(email: string, password: string) {
     const user = await this.userRepository.findOneBy({
       email,
     });
-    return !!user && user.comparePassword(password);
+
+    if (user && (await user.comparePassword(password))) return user;
+
+    throw new UnauthorizedException();
   }
 
   async getUserById(userId: string) {

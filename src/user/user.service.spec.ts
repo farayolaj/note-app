@@ -8,6 +8,7 @@ import { User } from './user.entity';
 import { UserService } from './user.service';
 import { Note } from '../note/note.entity';
 import { TypeOrmTestModule } from '../testing/type-orm.module';
+import { UnauthorizedException } from '@nestjs/common';
 
 const getUserDto = () => {
   const userDto = new CreateUserDto();
@@ -67,17 +68,15 @@ describe('UserService', () => {
         userDto.email,
         userDto.password,
       );
-      expect(verified).toBe(true);
+      expect(verified).toBeInstanceOf(User);
     });
 
     it('fails on a wrong password', async () => {
       const userDto = getUserDto();
       await service.createUser(userDto);
-      const verified = await service.verifyUser(
-        userDto.email,
-        'some_other_password',
-      );
-      expect(verified).toBe(false);
+      expect(
+        service.verifyUser(userDto.email, 'some_other_password'),
+      ).rejects.toThrow(UnauthorizedException);
     });
   });
 });

@@ -32,7 +32,7 @@ export class User {
     this.password = await bcrypt.hash(password, 10);
   }
 
-  async comparePassword(password: string) {
+  comparePassword(password: string) {
     return bcrypt.compare(password, this.password);
   }
 }
