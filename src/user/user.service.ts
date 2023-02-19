@@ -36,4 +36,9 @@ export class UserService {
 
     return user;
   }
+
+  async deleteUser(userId: string) {
+    const user = await this.getUserById(userId);
+    await this.userRepository.remove(user);
+  }
 }
