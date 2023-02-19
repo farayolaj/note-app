@@ -1,6 +1,6 @@
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import * as bcrypt from 'bcrypt';
-import { Note } from 'src/note/note.entity';
+import { Note } from '../note/note.entity';
 
 @Entity()
 export class User {

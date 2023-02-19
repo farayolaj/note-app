@@ -20,9 +20,10 @@
     "test:e2e": "jest --config ./test/jest-e2e.json"
   },
   "dependencies": {
+    "@faker-js/faker": "^7.6.0",
     "@nanogiants/nestjs-swagger-api-exception-decorator": "^1.6.5",
     "@nestjs/common": "^9.0.0",
-    "@nestjs/config": "nestjs/config",
+    "@nestjs/config": "2.2.0",
     "@nestjs/core": "^9.0.0",
     "@nestjs/jwt": "^10.0.2",
     "@nestjs/passport": "^9.0.3",
@@ -33,6 +34,7 @@
     "bcrypt": "^5.1.0",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.0",
+    "joi": "^17.7.1",
     "passport": "^0.6.0",
     "passport-jwt": "^4.0.1",
     "pg": "^8.9.0",

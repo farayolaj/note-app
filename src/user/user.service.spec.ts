@@ -1,67 +1,47 @@
+import { faker } from '@faker-js/faker';
 import { Test, TestingModule } from '@nestjs/testing';
-import { getRepositoryToken } from '@nestjs/typeorm';
-import { mockReset } from 'jest-mock-extended';
-import { mockRepositoryFactory } from '../common/mocks';
+import { getRepositoryToken, TypeOrmModule } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
 import { EmailConflictException } from './exception/email-conflict-exception';
 import { User } from './user.entity';
 import { UserService } from './user.service';
+import { Note } from '../note/note.entity';
+import { TypeOrmTestModule } from '../testing/type-orm.module';
 
 const getUserDto = () => {
   const userDto = new CreateUserDto();
-  userDto.email = 'someName@gmail.com';
-  userDto.firstName = 'Somto';
-  userDto.lastName = 'Adekunle';
-  userDto.password = 'Some_Secure_Password';
+  userDto.email = faker.internet.email();
+  userDto.firstName = faker.name.firstName();
+  userDto.lastName = faker.name.lastName();
+  userDto.password = faker.internet.password();
 
   return userDto;
 };
 
 describe('UserService', () => {
-  const mockRepository = mockRepositoryFactory<User>();
   let service: UserService;
+  let repository: Repository<User>;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [
-        UserService,
-        {
-          provide: getRepositoryToken(User),
-          useValue: mockRepository,
-        },
-      ],
+      imports: [TypeOrmTestModule, TypeOrmModule.forFeature([User, Note])],
+      providers: [UserService],
     }).compile();
 
     service = module.get<UserService>(UserService);
+    repository = module.get<Repository<User>>(getRepositoryToken(User));
   });
 
   describe('createUser', () => {
-    beforeEach(() => {
-      const map = new Map<string, User>();
-      mockRepository.save.mockImplementation(async (entity) => {
-        const user = entity as User;
-        user.id = 'uuid';
-        map.set(user.email, user);
-        return user;
-      });
-
-      mockRepository.findOneBy.mockImplementation(async (where) => {
-        if (Array.isArray(where)) where = where[0];
-
-        const user = map.get(where.email as string);
-        return user;
-      });
-    });
-
-    afterEach(() => {
-      mockReset(mockRepository);
+    afterEach(async () => {
+      await repository.clear();
     });
 
     it('creates user successfully', async () => {
       const userDto = getUserDto();
       const user = await service.createUser(userDto);
-      expect(mockRepository.save).toBeCalledTimes(1);
-      expect(user.id).toBe('uuid');
+      expect(user.id).toBeTruthy();
     });
 
     it('fails on email conflict', async () => {
@@ -75,29 +55,11 @@ describe('UserService', () => {
     it('hashes password', async () => {
       const userDto = getUserDto();
       const user = await service.createUser(userDto);
-      expect(mockRepository.save).toBeCalledTimes(1);
       expect(user.password).not.toEqual(userDto.password);
     });
   });
 
   describe('verifyUser', () => {
-    beforeEach(() => {
-      const map = new Map<string, User>();
-      mockRepository.save.mockImplementation(async (entity) => {
-        const user = entity as User;
-        user.id = 'uuid';
-        map.set(user.email, user);
-        return user;
-      });
-
-      mockRepository.findOneBy.mockImplementation(async (where) => {
-        if (Array.isArray(where)) where = where[0];
-
-        const user = map.get(where.email as string);
-        return user;
-      });
-    });
-
     it('verifies a user successfully', async () => {
       const userDto = getUserDto();
       await service.createUser(userDto);

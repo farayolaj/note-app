@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { PagingOpts } from 'src/common/paging-opts';
-import { UserService } from 'src/user/user.service';
+import { PagingOpts } from '../common/paging-opts';
+import { UserService } from '../user/user.service';
 import { Repository } from 'typeorm';
 import { CreateNoteDto } from './dto/create-note.dto';
 import { UpdateNoteDto } from './dto/update-note.dto';
