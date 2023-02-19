@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { PagingOpts } from '../common/paging-opts';
+import { PagingOptsDto } from '../common/dto/paging-opts.dto';
 import { UserService } from '../user/user.service';
 import { Repository } from 'typeorm';
 import { CreateNoteDto } from './dto/create-note.dto';
@@ -30,6 +30,7 @@ export class NoteService {
 
   /**
    * Update an existing note.
+   * @throws NoteNotFoundException
    */
   async updateNote(noteId: string, noteDto: UpdateNoteDto, userId: string) {
     let note = await this.noteRepository.findOneBy({
@@ -49,6 +50,7 @@ export class NoteService {
 
   /**
    * Delete an existing note.
+   * @throws NoteNotFoundException
    */
   async deleteNote(noteId: string, userId: string) {
     const note = await this.noteRepository.findOneBy({
@@ -65,6 +67,7 @@ export class NoteService {
 
   /**
    * Get a note by its id.
+   * @throws NoteNotFoundException
    */
   async getNote(noteId: string, userId: string) {
     const note = await this.noteRepository.findOneBy({
@@ -82,9 +85,7 @@ export class NoteService {
   /**
    * Get all notes that belong to a user.
    */
-  async getNotes(userId: string, paging?: PagingOpts) {
-    if (!paging) paging = new PagingOpts();
-
+  async getNotes(userId: string, paging: PagingOptsDto) {
     const notes = await this.noteRepository.find({
       where: {
         owner: {
