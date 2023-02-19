@@ -78,7 +78,7 @@ export class UserService {
     if (!user.comparePassword(passwordDto.oldPassword))
       throw new UnauthorizedException('Incorrect old password');
 
-    user.setPassword(passwordDto.newPassword);
+    await user.setPassword(passwordDto.newPassword);
     await this.userRepository.save(user);
   }
 }

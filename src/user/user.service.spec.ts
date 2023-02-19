@@ -8,6 +8,7 @@ import { Note } from '../note/note.entity';
 import { TypeOrmTestModule } from '../testing/type-orm.module';
 import { UnauthorizedException } from '@nestjs/common';
 import { generateUserDto } from '../common/testing/generators';
+import { UpdatePasswordDto } from './dto/update-password.dto';
 
 describe('UserService', () => {
   let service: UserService;
@@ -66,6 +67,20 @@ describe('UserService', () => {
       expect(
         service.verifyUser(userDto.email, 'some_other_password'),
       ).rejects.toThrow(UnauthorizedException);
+    });
+  });
+
+  describe('updatePassword', () => {
+    it('updates password successfully', async () => {
+      const userDto = generateUserDto();
+      const user = await service.createUser(userDto);
+      const passwordDto = new UpdatePasswordDto();
+      passwordDto.newPassword = 'new_password';
+      passwordDto.oldPassword = userDto.password;
+      await service.updatePassword(user.id, passwordDto);
+      expect(
+        service.verifyUser(userDto.email, passwordDto.newPassword),
+      ).resolves.toBeInstanceOf(User);
     });
   });
 });

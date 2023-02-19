@@ -7,10 +7,12 @@ import {
   HttpCode,
   HttpStatus,
   Patch,
+  Put,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { Auth } from '../auth/auth.decorator';
 import { UserId } from '../auth/user-id.decorator';
+import { UpdatePasswordDto } from './dto/update-password.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UserNotFoundException } from './exception/user-not-found.exception';
 import { UserService } from './user.service';
@@ -41,5 +43,16 @@ export class UserController {
   @HttpCode(HttpStatus.NO_CONTENT)
   async deleteUser(@UserId() userId: string) {
     return this.userService.deleteUser(userId);
+  }
+
+  @Put('password')
+  @Auth()
+  @ApiException(() => UserNotFoundException)
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async updatePassword(
+    @UserId() userId: string,
+    @Body() passwordDto: UpdatePasswordDto,
+  ) {
+    await this.userService.updatePassword(userId, passwordDto);
   }
 }
