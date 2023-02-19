@@ -14,6 +14,9 @@ export class UserService {
     @InjectRepository(User) private userRepository: Repository<User>,
   ) {}
 
+  /**
+   * @throws EmailConflictException
+   */
   async createUser(userDto: CreateUserDto) {
     let user = await this.userRepository.findOneBy({ email: userDto.email });
 
@@ -26,6 +29,7 @@ export class UserService {
 
   /**
    * Returns user information if the email and password are correct, else it throws an UnauthorizedException
+   * @throws UnauthorizedException
    */
   async verifyUser(email: string, password: string) {
     const user = await this.userRepository.findOneBy({
@@ -37,6 +41,9 @@ export class UserService {
     throw new UnauthorizedException();
   }
 
+  /**
+   * @throws UserNotFoundException
+   */
   async getUserById(userId: string) {
     const user = await this.userRepository.findOneBy({ id: userId });
 
@@ -45,17 +52,26 @@ export class UserService {
     return user;
   }
 
+  /**
+   * @throws UserNotFoundException
+   */
   async deleteUser(userId: string) {
     const user = await this.getUserById(userId);
     await this.userRepository.remove(user);
   }
 
+  /**
+   * @throws UserNotFoundException
+   */
   async updateUser(userId: string, userDto: UpdateUserDto) {
     let user = await this.getUserById(userId);
     user = this.userRepository.merge(user, userDto);
     return await this.userRepository.save(user);
   }
 
+  /**
+   * @throws UserNotFoundException, UnauthorizedException
+   */
   async updatePassword(userId: string, passwordDto: UpdatePasswordDto) {
     const user = await this.getUserById(userId);
 

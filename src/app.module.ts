@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserModule } from './user/user.module';
 import { NoteModule } from './note/note.module';
+import { AuthModule } from './auth/auth.module';
 import { ConfigModule } from '@nestjs/config';
 import { configuration, validationSchema } from './config';
 
@@ -20,6 +21,7 @@ import { configuration, validationSchema } from './config';
       synchronize: true,
     }),
     NoteModule,
+    AuthModule,
   ],
 })
 export class AppModule {}
