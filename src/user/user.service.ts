@@ -1,7 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
+import { UpdatePasswordDto } from './dto/update-password.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
 import { EmailConflictException } from './exception/email-conflict-exception';
 import { UserNotFoundException } from './exception/user-not-found.exception';
 import { User } from './user.entity';
@@ -40,5 +42,21 @@ export class UserService {
   async deleteUser(userId: string) {
     const user = await this.getUserById(userId);
     await this.userRepository.remove(user);
+  }
+
+  async updateUser(userId: string, userDto: UpdateUserDto) {
+    let user = await this.getUserById(userId);
+    user = this.userRepository.merge(user, userDto);
+    return await this.userRepository.save(user);
+  }
+
+  async updatePassword(userId: string, passwordDto: UpdatePasswordDto) {
+    const user = await this.getUserById(userId);
+
+    if (!user.comparePassword(passwordDto.oldPassword))
+      throw new UnauthorizedException('Incorrect old password');
+
+    user.setPassword(passwordDto.newPassword);
+    await this.userRepository.save(user);
   }
 }
