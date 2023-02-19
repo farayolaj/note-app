@@ -5,7 +5,7 @@ This is a the backend for a simple note application. It allows users to create a
 1. GET /user
 2. PATCH /user
 3. DELETE /user
-4. POST /user/password
+4. PUT /user/password
 5. POST /note
 6. GET /note
 7. GET /note/{noteId}
