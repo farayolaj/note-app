@@ -4,5 +4,6 @@ export class CreateNoteDto {
   @IsNotEmpty()
   title: string;
 
+  @IsNotEmpty()
   content: string;
 }

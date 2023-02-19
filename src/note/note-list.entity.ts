@@ -1,12 +1,12 @@
 import { Note } from './note.entity';
 
 export class NoteList {
-  notes: Note[];
+  data: Note[];
   page: number;
   pageCount: number;
 
-  constructor(notes: Note[], page: number, pageCount: number) {
-    this.notes = notes;
+  constructor(data: Note[], page: number, pageCount: number) {
+    this.data = data;
     this.page = page;
     this.pageCount = pageCount;
   }
