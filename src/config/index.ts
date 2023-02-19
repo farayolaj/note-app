@@ -7,10 +7,14 @@ export const configuration: ConfigFactory<ConfigObject> = () => ({
   jwt: {
     secret: process.env.JWT_SECRET,
   },
+  database: {
+    url: process.env.DATABASE_URL,
+  },
 });
 
 export const validationSchema = Joi.object({
   NODE_ENV: Joi.string().default('development'),
   PORT: Joi.number().default(3000),
   JWT_SECRET: Joi.string().required(),
+  DATABASE_URL: Joi.string().required(),
 });

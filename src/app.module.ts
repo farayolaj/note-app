@@ -3,7 +3,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserModule } from './user/user.module';
 import { NoteModule } from './note/note.module';
 import { AuthModule } from './auth/auth.module';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { configuration, validationSchema } from './config';
 
 @Module({
@@ -14,11 +14,14 @@ import { configuration, validationSchema } from './config';
       validationSchema,
     }),
     UserModule,
-    TypeOrmModule.forRoot({
-      type: 'sqlite',
-      database: 'notedb',
-      autoLoadEntities: true,
-      synchronize: true,
+    TypeOrmModule.forRootAsync({
+      imports: [ConfigModule],
+      useFactory: (configService: ConfigService) => ({
+        type: 'postgres',
+        url: configService.get<string>('database.url'),
+        autoLoadEntities: true,
+      }),
+      inject: [ConfigService],
     }),
     NoteModule,
     AuthModule,
